@@ -3,7 +3,7 @@ module.exports = (env) ->
   assert = env.require 'cassert'
   M = env.matcher
   _ = require('lodash')
-  ina219 = require('ina219')
+  #ina219 = require('ina219')
   mcp3424 = require('./adapters/mcp3424.js')
 
   class I2cPlugin extends env.plugins.Plugin
@@ -13,15 +13,16 @@ module.exports = (env) ->
 
       @deviceConfigDef = require("./device-config-schema")
 
-      @framework.deviceManager.registerDeviceClass('Ina219Device', {
-        configDef: @deviceConfigDef.Ina219Device,
-        createCallback: (config, lastState) => new Ina219Device(config, lastState, @config.debug)
-      })
+      #@framework.deviceManager.registerDeviceClass('Ina219Device', {
+      #  configDef: @deviceConfigDef.Ina219Device,
+      #  createCallback: (config, lastState) => new Ina219Device(config, lastState, @config.debug)
+      #})
       @framework.deviceManager.registerDeviceClass('Mcp3424Device', {
         configDef: @deviceConfigDef.Mcp3424Device,
         createCallback: (config, lastState) => new Mcp3424Device(config, lastState, @config.debug, @)
       })
 
+  ###
   class Ina219Device extends env.devices.Device
 
     attributes:
@@ -80,6 +81,7 @@ module.exports = (env) ->
     destroy:() =>
       clearInterval(@requestValueIntervalId)
       super()
+  ###
 
   class Mcp3424Device extends env.devices.Device
 
