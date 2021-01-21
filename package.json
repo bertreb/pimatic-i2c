@@ -25,7 +25,7 @@
     "current",
     "voltage"
   ],
-  "version": "0.0.8",
+  "version": "0.0.9",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bertreb/pimatic-i2c.git"
@@ -33,7 +33,7 @@
   "configSchema": "pimatic-i2c-config-schema.coffee",
   "dependencies": {
     "i2c": "^0.2.5",
-    "i2c-bus": "^4.0.10"
+    "ina219": "^4.0.10"
   },
   "peerDependencies": {
     "pimatic": "0.9.*"
