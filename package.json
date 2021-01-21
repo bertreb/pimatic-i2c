@@ -33,7 +33,7 @@
   "configSchema": "pimatic-i2c-config-schema.coffee",
   "dependencies": {
     "i2c": "^0.2.5",
-    "ina219": "^4.0.10"
+    "ina219": "^0.6.2"
   },
   "peerDependencies": {
     "pimatic": "0.9.*"
