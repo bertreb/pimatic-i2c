@@ -4,7 +4,7 @@ module.exports = (env) ->
   M = env.matcher
   _ = require('lodash')
   #ina219 = require('ina219')
-  mcp3424 = require('./adapters/mcp3424.js')
+  MCP3424 = require('./adapters/mcp3424.js')
 
   class I2cPlugin extends env.plugins.Plugin
     init: (app, @framework, @config) =>
@@ -93,19 +93,36 @@ module.exports = (env) ->
       @interval = @config.interval ? 10000
       @address = @config.address ? 0x40
       _device = @config.device  ? 1
-      @device = '/dev/i2c-' + _device
+      @device = _device
+      @channels = @config.channels
 
       env.logger.debug "@deviceConfigDef.Mcp3424Device: " + JSON.stringify(plugin.deviceConfigDef.Mcp3424Device.properties.gain,null,2)
 
       # gain: [0,1,2,3] = [x1,x2,x4,x8]
-      # resolution: [0,1,2,3] = [12,14,16,18] bits
+      switch @config.gain
+        when "x8"
+          @gain = 3
+        when "x4"
+          @gain = 2
+        when "x2"
+          @gain = 1
+        else
+          @gain = 0
 
-      @gain = _.indexOf(plugin.deviceConfigDef.Mcp3424Device.properties.gain.default, @config.gain) ? 0
-      @resolution = _.indexOf(plugin.deviceConfigDef.Mcp3424Device.properties.resolution.default, @config.resolution) ? 3
+      # resolution: [0,1,2,3] = [12,14,16,18] bits
+      switch @config.resolution
+        when 18
+          @resolution = 3
+        when 16
+          @resolution = 2
+        when 14
+          @resolution = 1
+        else
+          @resolution = 0
 
       @channelValues = {}
       @attributes = {}
-      for channel in @config.channels
+      for channel in @channels
         env.logger.debug "Channel: " + JSON.stringify(channel,null,2)
         @attributes[channel.name] =
           description: channel.name
@@ -116,26 +133,24 @@ module.exports = (env) ->
         @_createGetter channel.name, () =>
           return Promise.resolve @channelValues[channel.name]
 
-      env.logger.debug "I2c start mcp3424"
-      mcp = new mcp3424(@address, @gain, @resolution, @device)
+      env.logger.debug "I2c start mcp3424 " + JSON.stringify(MCP3424,null,2)
+
+      MCP3424.init(@address, @gain, @resolution, @device)
 
       requestValues = () =>
         env.logger.debug "Requesting mcp3424 sensor values"
         try
-          for channel in channels
-            @channelValues[channel.name] = mcp.getVoltage(channel.channel)
-            @emit channel.name, @channelValues[channel.name
+          for channel in @channels
+            @channelValues[channel.name] = MCP3424.getVoltage(channel.channel)
+            @emit channel.name, @channelValues[channel.name]
         catch err
           env.logger.debug "Error getting mcp3424 sensor values: #{err}"
 
-        @requestValueIntervalId = setInterval( requestValues, @interval)
+        @requestValueIntervalId = setTimeout( requestValues, @interval)
       
       requestValues()
 
       super()
-
-    getForwardPower: -> Promise.resolve(@_forwardPower)
-    getReflectedPower: -> Promise.resolve(@_reflectedPower)
 
     destroy:() =>
       clearInterval(@requestValueIntervalId)
