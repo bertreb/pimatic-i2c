@@ -1,5 +1,5 @@
 module.exports = {
-  title: "pimatic-ina219 device config schemas"
+  title: "pimatic-i2c device config schemas"
   Mcp3424Device: {
     title: "Mcp3424Device config options"
     type: "object"

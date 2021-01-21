@@ -116,17 +116,17 @@ module.exports = (env) ->
         @_createGetter channel.name, () =>
           return Promise.resolve @channelValues[channel.name]
 
+      env.logger.debug "I2c start mcp3424"
       mcp = new mcp3424(@address, @gain, @resolution, @device)
 
       requestValues = () =>
-        env.logger.debug "Requesting sensor values"
+        env.logger.debug "Requesting mcp3424 sensor values"
         try
-          @_forwardPower = mcp.getVoltage(@forwardPowerChannel)
-          @emit 'forwardPower', @_forwardPower
-          @_reflectedPower = mcp.getVoltage(@reflectedPowerChannel)
-          @emit 'reflectedPower', @_reflectedPower
+          for channel in channels
+            @channelValues[channel.name] = mcp.getVoltage(channel.channel)
+            @emit channel.name, @channelValues[channel.name
         catch err
-          env.logger.debug "Error getting sensor values: #{err}"
+          env.logger.debug "Error getting mcp3424 sensor values: #{err}"
 
         @requestValueIntervalId = setInterval( requestValues, @interval)
       

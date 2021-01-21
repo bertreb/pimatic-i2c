@@ -2,7 +2,7 @@
 /*
  * Node driver for MCP3424
  */
-var i2c = require('../i2c-bus');  // https://github.com/fivdi/i2c-bus
+var i2c = require('i2c-bus');  // https://github.com/fivdi/i2c-bus
 
 /**
  * Mcp3424 is the main class exported from the Node module
@@ -28,7 +28,7 @@ var MCP3424 = function() {}
 //   I2C Values
 // ==========================================================================
 
-var MCP342X_ADDRESS     = 0x00  ; default address
+var MCP342X_ADDRESS     = 0x00  ; // default address
 // ===========================================================================
 var MCP342X_RES_SHIFT       = 2  ;
 var MCP342X_RES_FIELD       = 0x0C  ;
