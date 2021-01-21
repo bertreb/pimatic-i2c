@@ -1,0 +1,46 @@
+{
+  "name": "pimatic-i2c",
+  "description": "Pimatic plugin for connecting i2c sensors",
+  "author": {
+    "name": "Bert Gierveld",
+    "email": "gitbertreb@gmail.com",
+    "url": "https://github.com/bertreb"
+  },
+  "main": "pimatic-i2c",
+  "files": [
+    "pimatic-i2c.coffee",
+    "pimatic-i2c-config-schema.coffee",
+    "device-config-schema.coffee",
+    "README.md",
+    "LICENSE",
+    "HISTORY.md",
+    "assets"
+  ],
+  "homepage": "https://github.com/bertreb/pimatic-i2c.git",
+  "keywords": [
+    "pimatic",
+    "ina219",
+    "i2c",
+    "sensor",
+    "current",
+    "voltage"
+  ],
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bertreb/pimatic-i2c.git"
+  },
+  "configSchema": "pimatic-i2c-config-schema.coffee",
+  "dependencies": {
+    "ina219": "^0.6.2",
+    "i2c-bus": "^4.0.10",
+    "nodejs-adcpi": "^0.1.1"
+  },
+  "peerDependencies": {
+    "pimatic": "0.9.*"
+  },
+  "engines": {
+    "node": ">=4",
+    "npm": ">=2"
+  }
+}
