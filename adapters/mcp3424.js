@@ -1,4 +1,4 @@
-var Wire = require('../node_modules/i2c-bus/i2c'),
+var Wire = require('i2c'),
     MCP342X_GAIN_FIELD = 0x03,
     MCP342X_GAIN_X1 = 0x00,
     MCP342X_GAIN_X2 = 0x01,
@@ -36,6 +36,7 @@ MCP3424 = (function() {
         this.gain = gain;
         this.res = res1;
         this.device = device != null ? device : '/dev/i2c-1';
+        this.wire = i2c.openSync(busNumber);
         this.wire = new Wire(this.address, {
             device: this.device
         });
