@@ -96,7 +96,7 @@ module.exports = (env) ->
       @device = _device
       @channels = @config.channels
 
-      env.logger.debug "@deviceConfigDef.Mcp3424Device: " + JSON.stringify(plugin.deviceConfigDef.Mcp3424Device.properties.gain,null,2)
+      #env.logger.debug "@deviceConfigDef.Mcp3424Device: " + JSON.stringify(plugin.deviceConfigDef.Mcp3424Device.properties.gain,null,2)
 
       # gain: [0,1,2,3] = [x1,x2,x4,x8]
       switch @config.gain
@@ -133,8 +133,9 @@ module.exports = (env) ->
         @_createGetter channel.name, () =>
           return Promise.resolve @channelValues[channel.name]
 
-      env.logger.debug "I2c start mcp3424 " + JSON.stringify(MCP3424,null,2)
+      env.logger.debug "I2c start mcp3424"
 
+      MCP3424.enableLogging(true)
       MCP3424.init(@address, @gain, @resolution, @device)
 
       requestValues = () =>
@@ -147,7 +148,7 @@ module.exports = (env) ->
           env.logger.debug "Error getting mcp3424 sensor values: #{err}"
 
         @requestValueIntervalId = setTimeout( requestValues, @interval)
-      
+
       requestValues()
 
       super()

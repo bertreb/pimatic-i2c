@@ -20,7 +20,7 @@ var MCP3424 = function() {}
  * Callback for returning a single value
  *
  * @callback onHaveValueCallback
- * @param {int} value - value returned by async operation 
+ * @param {int} value - value returned by async operation
  */
 
 // ===========================================================================
@@ -60,7 +60,7 @@ var MCP342X_BUSY            = 0x80;
 /**
   * Called to initilize the MCP3424.
   * @param {string} address - Address you want to use. Defaults to MCP342X_ADDRESS
-  * @param {integer} gain 
+  * @param {integer} gain
   * @param {integer} resolution
   * @param {integer} busNumber - the number of the I2C bus/adapter to open, 0 for /dev/i2c-0, 1 for /dev/i2c-1, (See github.com/fivdi/i2c-bus)
   */
@@ -69,17 +69,17 @@ MCP3424.prototype.init = function (address, gain, resolution, busNumber) {
   // defaults
   address = typeof address !== 'undefined' ? address : MCP342X_ADDRESS;
   busNumber = typeof busNumber !== 'undefined' ? busNumber : 1;
-  
+
   this.log("init:: " + address + " | " + gain + " | " + resolution + " | " + busNumber)
   this.resolution = resolution;
   this.gain = gain;
   this.channel = [];
   this.currChannel = 0;
   this.address = address;
-  
+
   this.wire = i2c.open(busNumber, function(err) {
     if (err !== null) {
-        return console.log(err);
+        return console.log("Error opening i2c: '+err);
     }
   });
   //this.wire = new i2c(this.address, {
@@ -102,7 +102,7 @@ MCP3424.prototype.enableLogging  = function (enable) {
   * @param {string} s - String to log
   */
 MCP3424.prototype.log  = function (s) {
-    
+
     if (this.loggingEnabled)
         console.log(s);
 }
@@ -120,9 +120,9 @@ MCP3424.prototype.writeRegister  = function (register, value, callback) {
 
     bytes[0] = (value >> 8) & 0xFF;
     bytes[1] = value & 0xFF
-         
+
     this.wire.writeI2cBlockSync(this.address, register, 2, bytes);
-    callback(null);      
+    callback(null);
 }
 */
 /**
@@ -135,13 +135,13 @@ MCP3424.prototype.writeRegister  = function (register, value, callback) {
 MCP3424.prototype.readRegister  = function (register, callback) {
 
     var res = Buffer.alloc(2);
-    
+
     this.wire.readI2cBlockSync(this.address, register, 2, res);
-    
+
     var value = res.readInt16BE();
-    
+
     this.log("::readRegister => [" + res[0] + ", " + res[1] + "]");
-        
+
     callback(value);
 }
 
@@ -264,7 +264,6 @@ MCP3424.prototype._getPga = function() {
     }
 }
 
-  
+
 // export is a Singleton
 module.exports = new MCP3424();
-
