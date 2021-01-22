@@ -142,7 +142,7 @@ module.exports = (env) ->
         env.logger.debug "Requesting mcp3424 sensor values"
         try
           for channel in @channels
-            @channelValues[channel.name] = MCP3424.getVoltage(channel.channel)
+            @channelValues[channel.name] = MCP3424.getMv(channel.channel)
             @emit channel.name, @channelValues[channel.name]
         catch err
           env.logger.debug "Error getting mcp3424 sensor values: #{err}"

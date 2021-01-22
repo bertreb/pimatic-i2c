@@ -77,15 +77,8 @@ MCP3424.prototype.init = function (address, gain, resolution, busNumber) {
   this.currChannel = 0;
   this.address = address;
 
-  this.wire = i2c.open(busNumber, function(err) {
-    if (err !== null) {
-        return console.log("Error opening i2c: '+err);
-    }
-  });
-  //this.wire = new i2c(this.address, {
-  //    device: this.device
-
-  //this._readDataContiuously();
+  this.wire = i2c.openSync(busNumber);
+  this._readDataContiuously();
 }
 
 /**
