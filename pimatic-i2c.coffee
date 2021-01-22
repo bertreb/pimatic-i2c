@@ -1,8 +1,8 @@
 module.exports = (env) ->
   Promise = env.require 'bluebird'
   assert = env.require 'cassert'
-  M = env.matcher
-  _ = require('lodash')
+  #M = env.matcher
+  #_ = require('lodash')
   #ina219 = require('ina219')
   MCP3424 = require('./adapters/mcp3424.js')
 
