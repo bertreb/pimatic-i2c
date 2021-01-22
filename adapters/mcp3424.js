@@ -78,7 +78,12 @@ MCP3424.prototype.init = function (address, gain, resolution, busNumber) {
   this.address = address;
 
   this.wire = i2c.openSync(busNumber);
-  this._readDataContiuously();
+  var devices = this.wire.scanSync();
+  if (address in devices) {
+    this._readDataContiuously();    
+  } else {
+    this.log("init:: device address '" + address + "' not available")
+  }
 }
 
 /**
