@@ -4,7 +4,7 @@ module.exports = (env) ->
   #M = env.matcher
   #_ = require('lodash')
   #ina219 = require('ina219')
-  MCP3424 = require('./adapters/mcp3424.js')
+  MCP3424 = require('./adapters/ReadADC_i2c.js')
 
   class I2cPlugin extends env.plugins.Plugin
     init: (app, @framework, @config) =>
@@ -95,6 +95,7 @@ module.exports = (env) ->
       _device = @config.device  ? 1
       @device = _device
       @channels = @config.channels
+      @nrOfChannels = @config.channels.length
 
       #env.logger.debug "@deviceConfigDef.Mcp3424Device: " + JSON.stringify(plugin.deviceConfigDef.Mcp3424Device.properties.gain,null,2)
 
@@ -120,6 +121,12 @@ module.exports = (env) ->
         else
           @resolution = 0
 
+      #check if channel is only used once
+      _channelAdded = {}
+      for channel in @config.channels
+        if _channelAdded[channel.channel]? then throw new Error("Channel #{channel.channel} is already added") 
+        _channelAdded[channel.channel] = channel.channel
+
       @channelValues = {}
       @attributes = {}
       for channel in @channels
@@ -133,17 +140,26 @@ module.exports = (env) ->
         @_createGetter channel.name, () =>
           return Promise.resolve @channelValues[channel.name]
 
-      env.logger.debug "I2c start mcp3424"
+      env.logger.debug "I2c start mcp3424 " #+ JSON.stringify(MCP3424,null,2)
 
-      MCP3424.enableLogging(true)
-      MCP3424.init(@address, @gain, @resolution, @device)
+      #init channels
+      MCP3424.setup(@nrOfChannels)
+
+      for channel in @config.channels
+        MCP3424.setOpt(channel.channel,'gain',@gain)
+        MCP3424.setOpt(channel.channel,'bits',@resolution)
+
 
       requestValues = () =>
         env.logger.debug "Requesting mcp3424 sensor values"
         try
           for channel in @channels
-            @channelValues[channel.name] = MCP3424.getMv(channel.channel)
-            @emit channel.name, @channelValues[channel.name]
+            _result = MCP3424.readChannel(channel.channel)
+            if _result.succes
+              @channelValues[channel.name] = _result.trueV
+              @emit channel.name, @channelValues[channel.name]
+            else
+              env.logger.debug "Reading channel #{channel.channel} not possible"
         catch err
           env.logger.debug "Error getting mcp3424 sensor values: #{err}"
 
