@@ -90,42 +90,46 @@ module.exports = (env) ->
       @id = @config.id
       @name = @config.name
 
-      @interval = @config.interval ? 10000
-      @address = @config.address ? 0x40
+      @address = @config.address ? 0x68
       _device = @config.device  ? 1
       @device = _device
       @channels = @config.channels
       @nrOfChannels = @config.channels.length
+
+      env.logger.debug "Config interval: " + @config.interval
+      @int = if @config.interval? then @config.interval else 5000
 
       #env.logger.debug "@deviceConfigDef.Mcp3424Device: " + JSON.stringify(plugin.deviceConfigDef.Mcp3424Device.properties.gain,null,2)
 
       # gain: [0,1,2,3] = [x1,x2,x4,x8]
       switch @config.gain
         when "x8"
-          @gain = 3
+          @gain = 8
         when "x4"
-          @gain = 2
+          @gain = 4
         when "x2"
-          @gain = 1
+          @gain = 2
         else
-          @gain = 0
+          @gain = 1
 
       # resolution: [0,1,2,3] = [12,14,16,18] bits
       switch @config.resolution
         when 18
-          @resolution = 3
+          @resolution = 18
         when 16
-          @resolution = 2
+          @resolution = 16
         when 14
-          @resolution = 1
+          @resolution = 14
         else
-          @resolution = 0
+          @resolution = 12
 
       #check if channel is only used once
       _channelAdded = {}
-      for channel in @config.channels
+      for channel, i in @config.channels
         if _channelAdded[channel.channel]? then throw new Error("Channel #{channel.channel} is already added") 
         _channelAdded[channel.channel] = channel.channel
+        if channel.multiplier <= 0 then throw new Error("Channel: #{channel.channel}, multiplier: #{channel.multiplier} is invalid") 
+        @config.channels[i]["multiplier"] = @config.channels[i].multiplier ? 1
 
       @channelValues = {}
       @attributes = {}
@@ -135,12 +139,12 @@ module.exports = (env) ->
           description: channel.name
           type: "number"
           unit: channel.unit ? ""
-          acronym: channel.acronym ? ""
+          acronym: channel.acronym ? channel.name
         @channelValues[channel.name] = lastState?[channel.name]?.value ? 0
         @_createGetter channel.name, () =>
           return Promise.resolve @channelValues[channel.name]
 
-      env.logger.debug "I2c start mcp3424 " #+ JSON.stringify(MCP3424,null,2)
+      env.logger.debug "I2c start mcp3424 " + @int #+ JSON.stringify(MCP3424,null,2)
 
       #init channels
       MCP3424.setup(@nrOfChannels)
@@ -152,18 +156,17 @@ module.exports = (env) ->
 
       requestValues = () =>
         env.logger.debug "Requesting mcp3424 sensor values"
-        try
-          for channel in @channels
-            _result = MCP3424.readChannel(channel.channel)
-            if _result.succes
-              @channelValues[channel.name] = _result.trueV
-              @emit channel.name, @channelValues[channel.name]
-            else
-              env.logger.debug "Reading channel #{channel.channel} not possible"
-        catch err
-          env.logger.debug "Error getting mcp3424 sensor values: #{err}"
-
-        @requestValueIntervalId = setTimeout( requestValues, @interval)
+        Promise.each(@config.channels, (channel)=>
+          MCP3424.readChannel(channel.channel)
+          .then (result)=>
+            _channel = channel
+            #env.logger.debug "Result: " + JSON.stringify(_channel,null,2)
+            @channelValues[_channel.name] = result.adcV * _channel.multiplier
+            @emit _channel.name, result.adcV * _channel.multiplier
+            Promise.resolve()
+        )
+        .then ()=>
+          @requestValueIntervalId = setTimeout( requestValues, @int)
 
       requestValues()
 

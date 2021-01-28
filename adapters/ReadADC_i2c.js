@@ -167,6 +167,8 @@ MCP3424.prototype.readADC = function (port){
     var size
     var i2cdata=Buffer(4); // place to store values read from the ADC
 
+    //console.log("data[port]['bits']: "+data[port]['chipaddr'])
+
     if (data[port]['bits'] == 18){
         size=4;
     }else{
@@ -222,6 +224,10 @@ MCP3424.prototype.adc2volt = function (port){
     // ADC load by the specsheet but doesn't work so good
     // The following formula/constants was created by calculate the proper Rl value over several voltage
     // samples and then reverse engineer the formula and constants needed to create the correct ADC load.
+
+    //console.log("adcV port "+port+", "+data[port]['adcV']+", raw: "+rawVal)
+
+    return
     
     try{
         Const1=TrimConstant[bits][gain]['Const1']
@@ -253,7 +259,7 @@ MCP3424.prototype.adc2volt = function (port){
         data[port]['volt']=data[port]['adcV'];
         data[port]['trueV']=data[port]['adcV'];
     }
-    //console.log("   port "+port+"  trueV: "+data[port]['trueV']);
+    console.log("   port "+port+"  trueV: "+data[port]['trueV']);
 } // adc2volt
 
 
@@ -314,13 +320,23 @@ MCP3424.prototype.setup = function (nrOfChannels) {
         }
 
     }
-    console.log("After setup: "+JSON.stringify(data,null,2));
+    //console.log("After setup: "+JSON.stringify(data,null,2));
 } // setup
 
-MCP3424.prototype.readChannel = function (channel) {
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+MCP3424.prototype.readChannel = async function (channel) {
+    //var succes = this.readADC(channel)
+    //await delay(1000)
     if (this.readADC(channel)) {
-        adc2volt(port)
-        return {succes: true, adcV: data[channel]['adcV'], trueV: data[port]['trueV']}
+        //await delay(100)
+        this.adc2volt(channel)
+        var volt = data[channel]['adcV']
+        console.log("adcV channel "+channel+", "+volt)
+
+        return {succes: true, adcV: volt}
     } else {
         return {succes: false}
     }

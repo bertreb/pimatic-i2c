@@ -26,6 +26,10 @@ module.exports = {
             name:
               description: "channel attribute name"
               type: "string"
+            multiplier:
+              description: "Multiplier for adjusting input value"
+              type: "number"
+              default: 1
             unit:
               description: "channel unit"
               type: "string"
@@ -35,16 +39,18 @@ module.exports = {
               type: "string"
               required: false
       gain:
+        description: "Sensor gain"
         type: "string"
         enum: ["x1","x2","x4","x8"]
         default: "x1"
       resolution:
+        description: "Sensor resolution"
         type: "number"
         enum: [12,14,16,18]
         default: 12
       interval:
-        interval: "Sensor read interval in ms"
-        type: "integer"
+        description: "Sensor read interval in ms"
+        type: "number"
         default: 10000
     }
   }
