@@ -158,13 +158,12 @@ module.exports = (env) ->
       requestValues = () =>
         env.logger.debug "Requesting mcp3424 sensor values"
         Promise.each(@config.channels, (channel)=>
-          MCP3424.readChannel(channel.channel)
-          .then (result)=>
-            _channel = channel
-            #env.logger.debug "Result: " + JSON.stringify(_channel,null,2)
-            @channelValues[_channel.name] = result.adcV * _channel.multiplier
-            @emit _channel.name, result.adcV * _channel.multiplier
-            Promise.resolve()
+          result = MCP3424.readChannel(channel.channel)
+          _channel = channel
+          #env.logger.debug "Result: " + JSON.stringify(_channel,null,2)
+          @channelValues[_channel.name] = result.adcV * _channel.multiplier
+          @emit _channel.name, result.adcV * _channel.multiplier
+          Promise.resolve()
         )
         .then ()=>
           @requestValueIntervalId = setTimeout( requestValues, @int)

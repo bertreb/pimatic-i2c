@@ -4,3 +4,5 @@
 	* initial release
 * 20210128, v0.1.0
 	* initial release
+* 20210130, v0.1.2
+	* edit
