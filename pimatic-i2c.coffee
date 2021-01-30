@@ -154,19 +154,23 @@ module.exports = (env) ->
         MCP3424.setOpt(channel.channel,'gain',@gain)
         MCP3424.setOpt(channel.channel,'bits',@resolution)
 
+      readChannel = (channel) =>
+        result = MCP3424.readChannel(channel.channel)
+        env.logger.debug "Result #{channel.channel}: " + JSON.stringify(result,null,2)
+        @channelValues[channel.name] = result.adcV * channel.multiplier
+        @emit channel.name, @channelValues[channel.name]
 
       requestValues = () =>
         env.logger.debug "Requesting mcp3424 sensor values"
-        Promise.each(@config.channels, (channel)=>
-          result = MCP3424.readChannel(channel.channel)
-          _channel = channel
-          #env.logger.debug "Result: " + JSON.stringify(_channel,null,2)
-          @channelValues[_channel.name] = result.adcV * _channel.multiplier
-          @emit _channel.name, result.adcV * _channel.multiplier
-          Promise.resolve()
-        )
-        .then ()=>
-          @requestValueIntervalId = setTimeout( requestValues, @int)
+        if @nrOfChannels > 0 and @config.channels[0].channel is 1
+          readChannel(@config.channels[0])
+        if @nrOfChannels > 1 and @config.channels[1].channel is 2
+          readChannel(@config.channels[1])
+        if @nrOfChannels > 2 and @config.channels[2].channel is 3
+          readChannel(@config.channels[2])
+        if @nrOfChannels > 3 and @config.channels[3].channel is 4
+          readChannel(@config.channels[3])
+        @requestValueIntervalId = setTimeout( requestValues, @int)
 
       requestValues()
 

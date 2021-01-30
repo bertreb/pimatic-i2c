@@ -331,7 +331,7 @@ MCP3424.prototype.readChannel = function (channel) {
     //var succes = this.readADC(channel)
     //await delay(1000)
     if (this.readADC(channel)) {
-        //await delay(100)
+        //await delay(500)
         this.adc2volt(channel)
         var volt = data[channel]['adcV']
         console.log("adcV channel "+channel+", "+volt)
