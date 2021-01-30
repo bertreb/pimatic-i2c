@@ -327,7 +327,7 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-MCP3424.prototype.readChannel = async function (channel) {
+MCP3424.prototype.readChannel = function (channel) {
     //var succes = this.readADC(channel)
     //await delay(1000)
     if (this.readADC(channel)) {

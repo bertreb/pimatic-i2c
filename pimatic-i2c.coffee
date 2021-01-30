@@ -112,6 +112,7 @@ module.exports = (env) ->
         else
           @gain = 1
 
+
       # resolution: [0,1,2,3] = [12,14,16,18] bits
       switch @config.resolution
         when 18
@@ -126,9 +127,9 @@ module.exports = (env) ->
       #check if channel is only used once
       _channelAdded = {}
       for channel, i in @config.channels
-        if _channelAdded[channel.channel]? then throw new Error("Channel #{channel.channel} is already added") 
+        if _channelAdded[channel.channel]? then throw new Error("Channel #{channel.channel} is already added")
         _channelAdded[channel.channel] = channel.channel
-        if channel.multiplier <= 0 then throw new Error("Channel: #{channel.channel}, multiplier: #{channel.multiplier} is invalid") 
+        if channel.multiplier <= 0 then throw new Error("Channel: #{channel.channel}, multiplier: #{channel.multiplier} is invalid")
         @config.channels[i]["multiplier"] = @config.channels[i].multiplier ? 1
 
       @channelValues = {}
