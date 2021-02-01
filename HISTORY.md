@@ -6,3 +6,7 @@
 	* initial release
 * 20210130, v0.1.2
 	* edit
+* 20210130, v0.1.3
+	* change in reading channels
+* 20210201, v0.1.4
+	* update register read

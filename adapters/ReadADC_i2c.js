@@ -11,7 +11,7 @@
 *           npm install i2c-bus
 *
 * 2019-07-16  Peter Sjoberg <peters-src AT techwiz DOT ca>
-*	Created as a partial port of Read_mcp3425.py
+*   Created as a partial port of Read_mcp3425.py
 *
 */
 
@@ -330,6 +330,23 @@ function delay(ms) {
 MCP3424.prototype.readChannel = function (channel) {
     //var succes = this.readADC(channel)
     //await delay(1000)
+
+    data[channel]['cnt']=0
+    while (this.readADC(channel) & MCP3424_RDY){
+        data[channel]['cnt']+=1
+        //console.log("count: "+data[channel]['cnt'])
+        if (data[channel]['cnt']>1000){
+            return {succes: false}
+            break
+        }
+    }
+    this.adc2volt(channel)
+    var volt = data[channel]['adcV']
+    console.log("adcV channel "+channel+", "+volt)
+
+    return {succes: true, adcV: volt}
+
+    /*
     if (this.readADC(channel)) {
         //await delay(500)
         this.adc2volt(channel)
@@ -340,6 +357,7 @@ MCP3424.prototype.readChannel = function (channel) {
     } else {
         return {succes: false}
     }
+    */
 }
 
 /****************
