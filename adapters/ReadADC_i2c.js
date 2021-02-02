@@ -274,7 +274,7 @@ MCP3424.prototype.setOpt = function (port,option,val){ //No error checking, just
 * Prime the data array with values
 */
 
-MCP3424.prototype.setup = function (nrOfChannels) {
+MCP3424.prototype.setup = function (address, nrOfChannels) {
     var board=1
     var chip=1
     var channel=1
@@ -287,7 +287,7 @@ MCP3424.prototype.setup = function (nrOfChannels) {
         data[port]['gain']=GAIN;
         data[port]['board']=board;
         data[port]['chip']=chip;
-        data[port]['chipaddr']=addresses[board*2+chip-3];
+        data[port]['chipaddr']=address; //addresses[board*2+chip-3];
         data[port]['channel']=channel;
         //console.log("port "+port+", board "+board+", chip "+chip+", channel "+channel+", addr idx: "+(board*2+chip-3)+" is 0x"+parseInt(data[port]['chipaddr'], 10).toString(16)+", bits: "+data[port]['bits']);
         data[port]['R1']=R1; // upper resistor in voltage divider

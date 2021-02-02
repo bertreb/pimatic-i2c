@@ -148,7 +148,7 @@ module.exports = (env) ->
       env.logger.debug "I2c start mcp3424 " + @int #+ JSON.stringify(MCP3424,null,2)
 
       #init channels
-      MCP3424.setup(@nrOfChannels)
+      MCP3424.setup(@address, @nrOfChannels)
 
       for channel in @config.channels
         MCP3424.setOpt(channel.channel,'gain',@gain)

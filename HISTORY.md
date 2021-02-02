@@ -10,3 +10,5 @@
 	* change in reading channels
 * 20210201, v0.1.4
 	* update register read
+* 20210202, v0.1.5
+	* correct address handling
