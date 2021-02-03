@@ -12,3 +12,5 @@
 	* update register read
 * 20210202, v0.1.5
 	* correct address handling
+* 20210203, v0.1.6
+	* update channel handling

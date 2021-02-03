@@ -274,14 +274,15 @@ MCP3424.prototype.setOpt = function (port,option,val){ //No error checking, just
 * Prime the data array with values
 */
 
-MCP3424.prototype.setup = function (address, nrOfChannels) {
+MCP3424.prototype.setup = function (address, channels) {
     var board=1
     var chip=1
     var channel=1
     var port
 
     //Fill in values for all <maxport> ports, non existing ones get status of invalid (in readADC)
-    for (port = 1; port <= nrOfChannels; port++) {
+    for (var i = 0; i < channels.length; i++) {
+        port = channels[i];
         data[port]= {}
         data[port]['bits']=BITS;
         data[port]['gain']=GAIN;

@@ -95,6 +95,7 @@ module.exports = (env) ->
       @device = _device
       @channels = @config.channels
       @nrOfChannels = @config.channels.length
+      @activeChannels = []
 
       env.logger.debug "Config interval: " + @config.interval
       @int = if @config.interval? then @config.interval else 5000
@@ -144,35 +145,41 @@ module.exports = (env) ->
         @channelValues[channel.name] = lastState?[channel.name]?.value ? 0
         @_createGetter channel.name, () =>
           return Promise.resolve @channelValues[channel.name]
+        @activeChannels.push channel.channel
 
       env.logger.debug "I2c start mcp3424 " + @int #+ JSON.stringify(MCP3424,null,2)
 
       #init channels
-      MCP3424.setup(@address, @nrOfChannels)
 
-      for channel in @config.channels
-        MCP3424.setOpt(channel.channel,'gain',@gain)
-        MCP3424.setOpt(channel.channel,'bits',@resolution)
+      env.logger.debug "@activeChannels: " + @activeChannels
 
-      readChannel = (channel) =>
-        result = MCP3424.readChannel(channel.channel)
-        env.logger.debug "Result #{channel.channel}: " + JSON.stringify(result,null,2)
-        @channelValues[channel.name] = result.adcV * channel.multiplier
-        @emit channel.name, @channelValues[channel.name]
+      if @activeChannels.length > 0
 
-      requestValues = () =>
-        env.logger.debug "Requesting mcp3424 sensor values"
-        if @nrOfChannels > 0 and @config.channels[0].channel is 1
-          readChannel(@config.channels[0])
-        if @nrOfChannels > 1 and @config.channels[1].channel is 2
-          readChannel(@config.channels[1])
-        if @nrOfChannels > 2 and @config.channels[2].channel is 3
-          readChannel(@config.channels[2])
-        if @nrOfChannels > 3 and @config.channels[3].channel is 4
-          readChannel(@config.channels[3])
-        @requestValueIntervalId = setTimeout( requestValues, @int)
+        MCP3424.setup(@address, @activeChannels)
 
-      requestValues()
+        for channel in @config.channels
+          MCP3424.setOpt(channel.channel,'gain',@gain)
+          MCP3424.setOpt(channel.channel,'bits',@resolution)
+
+        readChannel = (channel) =>
+          result = MCP3424.readChannel(channel.channel)
+          env.logger.debug "Result #{channel.channel}: " + JSON.stringify(result,null,2)
+          @channelValues[channel.name] = result.adcV * channel.multiplier
+          @emit channel.name, @channelValues[channel.name]
+
+        requestValues = () =>
+          env.logger.debug "Requesting mcp3424 sensor values"
+          if @nrOfChannels > 0 and @config.channels[0].channel is 1
+            readChannel(@config.channels[0])
+          if @nrOfChannels > 1 and @config.channels[1].channel is 2
+            readChannel(@config.channels[1])
+          if @nrOfChannels > 2 and @config.channels[2].channel is 3
+            readChannel(@config.channels[2])
+          if @nrOfChannels > 3 and @config.channels[3].channel is 4
+            readChannel(@config.channels[3])
+          @requestValueIntervalId = setTimeout( requestValues, @int)
+
+        requestValues()
 
       super()
 
