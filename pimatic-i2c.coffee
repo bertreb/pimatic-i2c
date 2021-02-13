@@ -132,6 +132,7 @@ module.exports = (env) ->
         _channelAdded[channel.channel] = channel.channel
         if channel.multiplier <= 0 then throw new Error("Channel: #{channel.channel}, multiplier: #{channel.multiplier} is invalid")
         @config.channels[i]["multiplier"] = @config.channels[i].multiplier ? 1
+        @config.channels[i]["offset"] = @config.channels[i].offset ? 0
 
       @channelValues = {}
       @attributes = {}
@@ -164,7 +165,7 @@ module.exports = (env) ->
         readChannel = (channel) =>
           result = MCP3424.readChannel(channel.channel)
           env.logger.debug "Result #{channel.channel}: " + JSON.stringify(result,null,2)
-          @channelValues[channel.name] = result.adcV * channel.multiplier
+          @channelValues[channel.name] = channel.offset + result.adcV * channel.multiplier
           @emit channel.name, @channelValues[channel.name]
 
         requestValues = () =>

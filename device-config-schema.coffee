@@ -30,6 +30,10 @@ module.exports = {
               description: "Multiplier for adjusting input value"
               type: "number"
               default: 1
+            offset:
+              description: "Offset for adjusting input value"
+              type: "number"
+              default: 0
             unit:
               description: "channel unit"
               type: "string"

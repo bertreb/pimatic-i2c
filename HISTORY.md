@@ -14,3 +14,5 @@
 	* correct address handling
 * 20210203, v0.1.6
 	* update channel handling
+* 20210213, v0.1.7
+	* added offset
