@@ -156,7 +156,7 @@ module.exports = (env) ->
 
       if @activeChannels.length > 0
 
-        MCP3424.setup(@address, @activeChannels)
+        MCP3424.setup(parseInt(@address), @activeChannels)
 
         for channel in @config.channels
           MCP3424.setOpt(channel.channel,'gain',@gain)
