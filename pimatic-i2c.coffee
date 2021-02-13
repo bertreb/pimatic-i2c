@@ -13,75 +13,10 @@ module.exports = (env) ->
 
       @deviceConfigDef = require("./device-config-schema")
 
-      #@framework.deviceManager.registerDeviceClass('Ina219Device', {
-      #  configDef: @deviceConfigDef.Ina219Device,
-      #  createCallback: (config, lastState) => new Ina219Device(config, lastState, @config.debug)
-      #})
       @framework.deviceManager.registerDeviceClass('Mcp3424Device', {
         configDef: @deviceConfigDef.Mcp3424Device,
         createCallback: (config, lastState) => new Mcp3424Device(config, lastState, @config.debug, @)
       })
-
-  ###
-  class Ina219Device extends env.devices.Device
-
-    attributes:
-      voltage:
-        description: "Voltage"
-        type: "number"
-        unit: 'V'
-        acronym: 'V'
-      current:
-        description: "Current"
-        type: "number"
-        unit: 'A'
-        acronym: 'A'
-
-    constructor: (config, lastState, logging) ->
-      @config = config
-      @id = @config.id
-      @name = @config.name
-
-      @interval = @config.interval ? 10000
-      @address = @config.address ? 0x40
-      @device = @config.device ? 1
-
-      @_voltage = lastState?.voltage?.value
-      @_current = lastState?.current?.value
-
-      ina219.init(@address, @device)
-      ina219.enableLogging(logging)
-
-      requestValues = () =>
-        env.logger.debug "Requesting sensor values"
-        try
-          ina219.getBusVoltage_V((_volts) =>
-            if Number.isNaN(_volts) then _volts = 0
-            env.logger.debug "Voltage (V): " + _volts
-            @emit "voltage", _volts
-            ina219.getCurrent_mA((_current) =>
-              if Number.isNaN(_current) then _current = 0
-              env.logger.debug "Current (mA): " + _current
-              @emit "current", _current / 1000
-            )
-          )
-        catch err
-          env.logger.debug "Error getting sensor values: #{err}"
-
-      ina219.calibrate32V1A(() => # kan ook ina219.calibrate32V2A
-        requestValues()
-        @requestValueIntervalId = setInterval( requestValues, @interval)
-      )
-
-      super()
-
-    getVoltage: -> Promise.resolve(@_voltage)
-    getCurrent: -> Promise.resolve(@_current)
-
-    destroy:() =>
-      clearInterval(@requestValueIntervalId)
-      super()
-  ###
 
   class Mcp3424Device extends env.devices.Device
 
@@ -90,17 +25,14 @@ module.exports = (env) ->
       @id = @config.id
       @name = @config.name
 
-      @address = @config.address ? "0x68"
-      _device = @config.device  ? 1
-      @device = _device
+      @address = (if @config.address? then @config.address else "0x68")
+      env.logger.debug "Used address is " + @address
       @channels = @config.channels
       @nrOfChannels = @config.channels.length
       @activeChannels = []
 
       env.logger.debug "Config interval: " + @config.interval
       @int = if @config.interval? then @config.interval else 5000
-
-      #env.logger.debug "@deviceConfigDef.Mcp3424Device: " + JSON.stringify(plugin.deviceConfigDef.Mcp3424Device.properties.gain,null,2)
 
       # gain: [0,1,2,3] = [x1,x2,x4,x8]
       switch @config.gain

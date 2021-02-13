@@ -16,5 +16,6 @@
 	* update channel handling
 * 20210213, v0.1.7
 	* added offset
-* 20210213, v0.1.9
+* 20210213, v0.1.10
 	* edit address hexadecimal handling
+	* no default address
