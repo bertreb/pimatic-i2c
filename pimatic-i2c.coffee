@@ -90,7 +90,7 @@ module.exports = (env) ->
       @id = @config.id
       @name = @config.name
 
-      @address = @config.address ? 0x68
+      @address = @config.address ? "0x68"
       _device = @config.device  ? 1
       @device = _device
       @channels = @config.channels

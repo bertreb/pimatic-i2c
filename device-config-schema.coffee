@@ -11,8 +11,8 @@ module.exports = {
         default: 1
       address:
         description: "Address of the mcp3424 sensor"
-        type: "number"
-        default: 0x68
+        type: "string"
+        default: "0x68"
       channels:
         description: "Input channel attributes"
         type: "array"
