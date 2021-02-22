@@ -19,3 +19,5 @@
 * 20210213, v0.1.10
 	* edit address hexadecimal handling
 	* no default address
+* 20210222, v0.1.11
+	* trunk display value to 0

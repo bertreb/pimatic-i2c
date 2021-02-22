@@ -98,6 +98,7 @@ module.exports = (env) ->
           result = MCP3424.readChannel(channel.channel)
           env.logger.debug "Result #{channel.channel}: " + JSON.stringify(result,null,2)
           @channelValues[channel.name] = channel.offset + result.adcV * channel.multiplier
+          if @channelValues[channel.name] < 0 then @channelValues[channel.name] = 0
           @emit channel.name, @channelValues[channel.name]
 
         requestValues = () =>
